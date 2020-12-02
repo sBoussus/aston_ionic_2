@@ -1,7 +1,8 @@
 import { PageSharingDataService } from './../page-sharing-data.service';
 import { MEALDB_Category, MEALDB_ListItem } from './../model';
 import { MealdbApiService } from './../mealdb-api.service';
-import { Component, DoCheck, OnChanges, OnInit } from '@angular/core';
+import { Component, DoCheck, OnChanges, OnInit, ViewChild } from '@angular/core';
+import { IonSelect } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -10,11 +11,10 @@ import { Component, DoCheck, OnChanges, OnInit } from '@angular/core';
 })
 export class HomePage implements OnInit, DoCheck {
 
-  area: string = '';
-
   meals: MEALDB_ListItem[] | null = null;
   categoryList: string[] = [];
-  selectedCategory: string | null = null;
+  area: string = '';
+  @ViewChild('selectedCategory', { static: false }) selectedCategory: IonSelect;
 
   constructor(
     private  mealDb: MealdbApiService,
@@ -28,9 +28,9 @@ export class HomePage implements OnInit, DoCheck {
 
   ngDoCheck() {
     if (this.area !== '') {
+      this.selectedCategory.value = '';
       this.getMealsByArea(this.area);
-      this.area = '';
-      this.clearSelection();
+      this.pageSharingData.changeArea('');
     }
   }
 
@@ -55,12 +55,8 @@ export class HomePage implements OnInit, DoCheck {
 
   selectCategory(event) {
     let selectedValue = event.detail.value;
-    this.selectedCategory = selectedValue;
-    this.getMealsByCategory(this.selectedCategory);
-  }
-
-  clearSelection() {
-    this.selectedCategory = null;
+    this.selectedCategory.value = selectedValue;
+    this.getMealsByCategory(this.selectedCategory.value);
   }
 
 }
